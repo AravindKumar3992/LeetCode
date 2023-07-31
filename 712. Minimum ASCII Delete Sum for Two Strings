@@ -1,0 +1,77 @@
+/**
+  Recursion and Backtracking
+  --------------------------
+  1. Keep pointer on both given string and check the character on each recursive
+  call.
+  2.If characters are match, move forwared to explore the further possiblities.
+  3.If characters are not match, remove the character from both string. I mean
+  two possiblity. Like 0-1 knapsack.
+  4.Base condition : 
+        i) if both pointer reaches last index.
+       ii) if any one of the pointer reach last index.
+  T.C : O(2^M+N). S.C : O(2^M+N) (Auxilary space)
+ * */
+
+var minimumDeleteSum = function(s1, s2) {
+    return computeCost(s1, s2, 0, 0); 
+};
+
+var computeCost = function(s1, s2, m, n) {
+
+    if ( m === s1.length && n === s2.length) {
+        return 0;
+    } else if (m === s1.length) {
+        return Number(s2.charCodeAt(n)) + computeCost(s1, s2, m, n + 1); 
+    } else if (n === s2.length) {
+        return Number(s1.charCodeAt(m)) + computeCost(s1, s2, m + 1, n);
+    } else {
+        if (s1[m] === s2[n]) {
+            return computeCost(s1, s2, m + 1, n + 1);
+        } else {
+            return Math.min(
+                Number(s2.charCodeAt(n)) + computeCost(s1, s2, m, n + 1),
+                Number(s1.charCodeAt(m)) + computeCost(s1, s2, m + 1, n)
+            );
+        }
+    }
+};
+
+
+
+/**
+  Dynamic Programming : Memoization
+  ---------------------------------
+  1. Save the result of each recursive call to avoid the repeative sub task.
+  T.C : O(M*N). S.C : O(M*N) (Dp array)
+ * */
+
+var minimumDeleteSum = function(s1, s2) {
+    const dpArray = new Array(s1.length + 1);
+    for (let i = 0; i <= s1.length; i++) {
+        dpArray[i] = new Array(s2.length + 1).fill(-1);
+    }
+    computeCost(s1, s2, 0, 0, dpArray);
+    return dpArray[0][0];
+};
+
+var computeCost = function(s1, s2, m, n, dpArray) {
+    if (dpArray[m][n] !== -1) {
+        return dpArray[m][n];
+    }
+    if ( m === s1.length && n === s2.length) {
+        return 0;
+    } else if (m === s1.length) {
+        return dpArray[m][n] = s2.charCodeAt(n) + computeCost(s1, s2, m, n + 1, dpArray); 
+    } else if (n === s2.length) {
+        return dpArray[m][n] = s1.charCodeAt(m) + computeCost(s1, s2, m + 1, n, dpArray);
+    } else {
+        if (s1[m] === s2[n]) {
+            return dpArray[m][n] = computeCost(s1, s2, m + 1, n + 1, dpArray);
+        } else {
+            return dpArray[m][n] = Math.min(
+                Number(s2.charCodeAt(n)) + computeCost(s1, s2, m, n + 1, dpArray),
+                Number(s1.charCodeAt(m)) + computeCost(s1, s2, m + 1, n, dpArray)
+            );
+        }
+    } 
+};
